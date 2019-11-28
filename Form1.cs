@@ -112,11 +112,8 @@ namespace kdrs_dcm_log_read
                        // description.Add("126 - Starting conversion of blob");
                     }
 
-                    if (!line.Contains("BLOBConversionProcess") || !line.Contains("INFO") || String.IsNullOrEmpty(sequence))
+                    if (!line.Contains("BLOBConversionProcess") || (!line.Contains("INFO") && !line.Contains("WARN") && !line.Contains("ERROR")) || String.IsNullOrEmpty(sequence))
                         continue;
-
-                    
-
 
                     if (!line.Contains("BLOBConversionProcess:126"))
                     {
@@ -152,9 +149,42 @@ namespace kdrs_dcm_log_read
                         Console.WriteLine(tempSplit);
                         break;
                     }
-
-
                 }
+
+                // Add last file sequence
+                if (seqCount.ContainsKey(sequence))
+                {
+                    seqCounter++;
+
+                    Console.WriteLine(seqCounter);
+                    try
+                    {
+                        seqCount[sequence]++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Unable to add sequence value");
+                        Console.WriteLine(sequence);
+                    }
+                    txtBoxLog.Text = seqCounter.ToString();
+                }
+                else
+                {
+                    seqCounter++;
+                    txtBoxLog.Text = seqCounter.ToString();
+                    Console.WriteLine(seqCounter);
+                    try
+                    {
+                        seqCount.Add(sequence, 1);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Unable to add sequence");
+                        Console.WriteLine(sequence);                        
+                    }
+                }
+
             }
             description.Sort();
 
